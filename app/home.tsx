@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import NotificationsComponent from './notifications';
 const { height } = Dimensions.get('window');
 
 type ModelResult = {
@@ -11,7 +12,36 @@ export default function Home() {
     const scrollY = useRef(new Animated.Value(0)).current;
     const router = useRouter();
 
-    // Interpolate the scroll value to create the opacity for the header
+    const [result, setResult] = useState<ModelResult | null>(null);
+    type ModelResult = {
+        prediction: string;
+    };
+
+    useEffect(() => {
+        const ws = new WebSocket('ws://your-server-ip:5000');  // WebSocket URL to connect to the Flask server
+
+        ws.onopen = () => {
+        console.log('Connected to the WebSocket server');
+        };
+
+        ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        setResult(data.result);  // Update the result whenever a new one is received
+        };
+
+        ws.onerror = (e) => {
+        console.error('WebSocket error: ', e);
+        };
+
+        ws.onclose = (e) => {
+        console.log('WebSocket connection closed');
+        };
+
+        return () => {
+        ws.close();  // Clean up WebSocket on component unmount
+        };
+    }, []);
+
     const headerOpacity = scrollY.interpolate({
         inputRange: [0, 150], // Start fading after 150 pixels of scroll
         outputRange: [1, 0], // Fully visible to invisible
@@ -54,7 +84,8 @@ export default function Home() {
                 scrollEventThrottle={16} // Smooth scrolling updates
             >
                 <View style={styles.sectionLarge}>
-                    {/* No text content here as requested */}
+                    <Text>Real-time Model Result: {result ? result.prediction : 'Waiting for result...'}</Text>
+                    <NotificationsComponent />
                 </View>
 
                 <View style={styles.sectionSmall}>
