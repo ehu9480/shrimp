@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
@@ -11,29 +11,36 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export default function NotificationsComponent() {
-  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
+export default function NotificationsComponent({ cooldown }: { cooldown: number }) {
+  const [countdown, setCountdown] = useState<number>(cooldown); // Initialize with the cooldown value
 
   useEffect(() => {
-    registerForPushNotis().then(token => {
-      if (token) setExpoPushToken(token);
-    });
-    return () => {
+    // Countdown logic
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown(prev => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
 
-    };
-  }, []);
+  useEffect(() => {
+    // Reset countdown whenever cooldown changes
+    setCountdown(cooldown);
+  }, [cooldown]);
 
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Button
-        title="Notify me"
-        onPress={schedulePushNotification}
-      />
+      {countdown > 0 ? (
+        <Text>{`Next notification can be sent in ${countdown} second(s)`}</Text>
+      ) : (
+        <Text>Notification system ready!</Text>
+      )}
     </View>
   );
 }
 
-async function schedulePushNotification() {
+export async function schedulePushNotification() {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "Shrimp App",
@@ -46,14 +53,12 @@ async function schedulePushNotification() {
 async function registerForPushNotis() {
   let token;
 
-
   await Notifications.setNotificationChannelAsync('default', {
     name: 'default',
     importance: Notifications.AndroidImportance.MAX,
     vibrationPattern: [0, 250, 250, 250],
     lightColor: '#FF231F7C',
   });
-
 
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
@@ -69,11 +74,6 @@ async function registerForPushNotis() {
   }
 
   const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
-
-  // if (!projectId) {
-  //   console.error('Project ID not found.');
-  //   return null;
-  // }
 
   token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
   console.log('Expo Push Token:', token);

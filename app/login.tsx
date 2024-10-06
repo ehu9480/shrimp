@@ -7,8 +7,8 @@ import { router } from 'expo-router';
 const Login = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const pinataJwt="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI3ZTQzMTc0ZC0yMjlhLTRiNTYtYTM4OC1iMzlkNmJlNmZkZjEiLCJlbWFpbCI6ImF5YWFuLmJhcmdlZXJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiRlJBMSJ9LHsiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiTllDMSJ9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImZhYjBkNjlmYWJiZjZhNjUwMGUzIiwic2NvcGVkS2V5U2VjcmV0IjoiNzg4ZGU3NWEwMzg0NDljYTFjMzcxYTIxNzFlZWI2ODZiYWE4Y2EyZDU0NTc2ZDgwY2QwZTM1OWY4NGNmZWI5MCIsImV4cCI6MTc1OTYzMjUwOH0.HxtiMazJJJo45Kt3nTjOnl7Y0uRpDaS0L0EHM17kDhQ"
-  const pinataGateway="ivory-hidden-thrush-846.mypinata.cloud"
+  const pinataJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI3ZTQzMTc0ZC0yMjlhLTRiNTYtYTM4OC1iMzlkNmJlNmZkZjEiLCJlbWFpbCI6ImF5YWFuLmJhcmdlZXJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiRlJBMSJ9LHsiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiTllDMSJ9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImZhYjBkNjlmYWJiZjZhNjUwMGUzIiwic2NvcGVkS2V5U2VjcmV0IjoiNzg4ZGU3NWEwMzg0NDljYTFjMzcxYTIxNzFlZWI2ODZiYWE4Y2EyZDU0NTc2ZDgwY2QwZTM1OWY4NGNmZWI5MCIsImV4cCI6MTc1OTYzMjUwOH0.HxtiMazJJJo45Kt3nTjOnl7Y0uRpDaS0L0EHM17kDhQ"
+  const pinataGateway = "ivory-hidden-thrush-846.mypinata.cloud"
   const userscid = "bafkreigk3gef4zfasqndybzk5httrq6ry3tycov6b2llmk44b44huvm3dq"
   const pinata = new PinataSDK({
     pinataJwt: pinataJwt,
@@ -18,7 +18,7 @@ const Login = () => {
   const fetchUsersFromPinata = async () => {
     try {
       const data = await pinata.gateways.get(userscid);
-      if(data && data.data && typeof(data.data) == 'string'){
+      if (data && data.data && typeof (data.data) == 'string') {
         return JSON.parse(data.data)
       }
     } catch (error) {
@@ -35,7 +35,7 @@ const Login = () => {
     const users = await fetchUsersFromPinata();
     if (users && users['users']) {
       let userExists = false;
-  
+
       for (let i = 0; i < users['users'].length; i++) {
         const user = users['users'][i];
         if (user.username === email && user.password === password) {
@@ -45,12 +45,19 @@ const Login = () => {
       }
       if (userExists) {
         router.replace('/home');
-      } 
-    }else {
+      }
+    } else {
       Alert.alert('Error', 'Invalid email or password');
     }
   };
 
+  const handleSignUp = () => {
+    Alert.alert(
+      'Sign Up',
+      'Sign up functionality will be available soon!',
+      [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -76,6 +83,10 @@ const Login = () => {
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
+        <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
       </TouchableOpacity>
     </View>
   );
@@ -116,6 +127,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  signupButton: {
+    marginTop: 20,
+  },
+  signupText: {
+    color: '#b35242',
+    fontSize: 16,
   },
 });
 
