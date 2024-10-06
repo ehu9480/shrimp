@@ -70,10 +70,10 @@ async function registerForPushNotis() {
 
   const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
 
-  if (!projectId) {
-    console.error('Project ID not found.');
-    return null;
-  }
+  // if (!projectId) {
+  //   console.error('Project ID not found.');
+  //   return null;
+  // }
 
   token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
   console.log('Expo Push Token:', token);

@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import NotificationsComponent from './notifications';
+import Graphs from './graphs';
+
 const { height } = Dimensions.get('window');
 
 type ModelResult = {
@@ -18,27 +20,27 @@ export default function Home() {
     };
 
     useEffect(() => {
-        const ws = new WebSocket('ws://your-server-ip:5000');  // WebSocket URL to connect to the Flask server
+        const ws = new WebSocket('ws://10.48.183.102:8000/ws');  // WebSocket URL to connect to the Flask server
 
         ws.onopen = () => {
-        console.log('Connected to the WebSocket server');
+            console.log('Connected to the WebSocket server');
         };
 
         ws.onmessage = (e) => {
-        const data = JSON.parse(e.data);
-        setResult(data.result);  // Update the result whenever a new one is received
+            const data = JSON.parse(e.data);
+            setResult(data.result);  // Update the result whenever a new one is received
         };
 
         ws.onerror = (e) => {
-        console.error('WebSocket error: ', e);
+            console.error('WebSocket error: ', e);
         };
 
         ws.onclose = (e) => {
-        console.log('WebSocket connection closed');
+            console.log('WebSocket connection closed');
         };
 
         return () => {
-        ws.close();  // Clean up WebSocket on component unmount
+            ws.close();  // Clean up WebSocket on component unmount
         };
     }, []);
 
