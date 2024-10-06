@@ -55,11 +55,11 @@ export default function Home() {
             const receivedData = JSON.parse(e.data);
             setResult({
                 data: receivedData.data,
-                prediction: receivedData.data === 1 ? '1' : '0',
+                prediction: receivedData.data === '1' ? '1' : '0',
             });
 
             // Only send a notification if the cooldown is 0, notifications are enabled, ready for notification, and the data is '1'
-            if (notificationsEnabled && receivedData.data === 1 && cooldown === 0 && readyForNotification) {
+            if (notificationsEnabled && receivedData.data === '1' && cooldown === 0 && readyForNotification) {
                 schedulePushNotification() // Trigger push notification
                     .then(() => {
                         setCooldown(15);  // Start 15-second cooldown only after sending the notification
@@ -70,7 +70,7 @@ export default function Home() {
                     });
             }
 
-            if (receivedData.data === 1) {
+            if (receivedData.data === '1') {
                 setData((prevData) => {
                     const newData = [...prevData];
                     newData[newData.length - 1]++;
