@@ -44,7 +44,7 @@ export default function Home() {
     const [result, setResult] = useState<ResultType | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket('ws://10.48.183.102:8000/ws');
+        const ws = new WebSocket('ws://10.48.163.223:8080/ws');
 
         ws.onopen = () => {
             console.log('Connected to WebSocket');
@@ -132,7 +132,12 @@ export default function Home() {
         style: {
             borderRadius: 16,
         },
+        propsForLabels: {
+            fontSize: 16, 
+        },
+        barPercentage: .3
     };
+
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -191,14 +196,19 @@ export default function Home() {
                     </View>
                 </View>
                 <View style={styles.graphSection}>
+                    <Text style={styles.toggleLabel}>Your Shrimp Count:</Text>
                     <View style={styles.container}>
                         <BarChart
                             data={barData}
-                            width={screenWidth * 0.9}
-                            height={screenHeight * 0.6}
+                            width={screenWidth * 0.9} // Set the width to 90% of the screen width to create space on both sides
+                            height={screenHeight * 0.5} // Adjusted height to reduce cutting off
                             chartConfig={chartConfig}
                             style={styles.chart}
                             fromZero
+                            xLabelsOffset={20} // Adjust label position for better alignment
+                            yLabelsOffset={25} // Adjust label position for better alignment
+                            showValuesOnTopOfBars={true}
+                            showBarTops={true}
                         />
                     </View>
                 </View>
