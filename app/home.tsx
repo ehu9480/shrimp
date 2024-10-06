@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
-
+import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 const { height } = Dimensions.get('window');
 
 type ModelResult = {
@@ -9,6 +9,7 @@ type ModelResult = {
 
 export default function Home() {
     const scrollY = useRef(new Animated.Value(0)).current;
+    const router = useRouter();
 
     // Interpolate the scroll value to create the opacity for the header
     const headerOpacity = scrollY.interpolate({
@@ -23,6 +24,10 @@ export default function Home() {
         outputRange: [height * 0.1, 0], // Full height to 0 (disappears)
         extrapolate: 'clamp', // Don't go beyond this range
     });
+
+    const handleSignOut = () => {
+        router.replace('/login');
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
