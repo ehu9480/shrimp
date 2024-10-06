@@ -43,7 +43,6 @@ const Login = () => {
           break; // No need to continue once we find a match
         }
       }
-      console.log(userExists)
       if (userExists) {
         router.replace('/home');
       } 

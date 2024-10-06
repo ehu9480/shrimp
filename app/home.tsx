@@ -1,46 +1,72 @@
-import React, { useRef } from 'react';
-import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
+import React, { useRef, useState, useEffect } from 'react';
+import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView, Text } from 'react-native';
 
 const { height, width } = Dimensions.get('window'); // Get screen height and width for sizing the sections
 
+type ModelResult = {
+    prediction: string;
+};
+
 export default function Home() {
     const scrollY = useRef(new Animated.Value(0)).current;
+    const [result, setResult] = useState<ModelResult | null>(null);
 
-    // Interpolate the scroll value to create the opacity for the header
     const headerOpacity = scrollY.interpolate({
-        inputRange: [0, 150], // Start fading after 150 pixels of scroll
-        outputRange: [1, 0], // Fully visible to invisible
-        extrapolate: 'clamp', // Don't go beyond this range
+        inputRange: [0, 150], 
+        outputRange: [1, 0],
+        extrapolate: 'clamp',
     });
 
-    // Interpolate the scroll value to reduce the height of the header
     const headerHeight = scrollY.interpolate({
-        inputRange: [0, 150], // Start reducing height after 150 pixels of scroll
-        outputRange: [height * 0.1, 0], // Full height to 0 (disappears)
-        extrapolate: 'clamp', // Don't go beyond this range
+        inputRange: [0, 150],
+        outputRange: [height * 0.1, 0],
+        extrapolate: 'clamp',
     });
+
+    // useEffect(() => {
+    //     const ws = new WebSocket('ws://10.48.163.223:8000');  
+    
+    //     ws.onopen = () => {
+    //       console.log('Connected to the WebSocket server');
+    //     };
+    
+    //     ws.onmessage = (e) => {
+    //       const data = JSON.parse(e.data);
+    //       setResult(data.result); 
+    //     };
+    
+    //     ws.onerror = (e) => {
+    //       console.error('WebSocket error: ', e);
+    //     };
+    
+    //     ws.onclose = (e) => {
+    //       console.log('WebSocket connection closed');
+    //     };
+    
+    //     return () => {
+    //       ws.close();  
+    //     };
+    //   }, []);
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* Animated Header */}
             <Animated.View style={[styles.header, { opacity: headerOpacity, height: headerHeight }]}>
                 <Animated.Text style={[styles.headerText, { opacity: headerOpacity }]}>
                     Welcome to Shrimp
                 </Animated.Text>
             </Animated.View>
 
-            {/* Scrollable content */}
             <Animated.ScrollView
                 contentContainerStyle={styles.container}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: false } // Native driver doesn't support height and opacity yet
+                    { useNativeDriver: false }
                 )}
-                scrollEventThrottle={16} // Smooth scrolling updates
+                scrollEventThrottle={16} 
             >
                 {/* First section - nearly full page */}
                 <View style={styles.sectionLarge}>
-                    {/* No text content here as requested */}
+                    {/* <Text>Shrimping? {result ? result.prediction : 'Waiting for result...'}</Text> */}
                 </View>
 
                 {/* Second and third sections - smaller vertical boxes */}
