@@ -1,48 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import NotificationsComponent from './notifications';
 import Graphs from './graphs';
+import { WebSocketProvider } from './WebSocketProvider'; // Import the WebSocketProvider
 
 const { height } = Dimensions.get('window');
-
-type ModelResult = {
-    prediction: string;
-};
 
 export default function Home() {
     const scrollY = useRef(new Animated.Value(0)).current;
     const router = useRouter();
-
-    const [result, setResult] = useState<ModelResult | null>(null);
-    type ModelResult = {
-        prediction: string;
-    };
-
-    useEffect(() => {
-        const ws = new WebSocket('ws://10.48.183.102:8000/ws');  // WebSocket URL to connect to the Flask server
-
-        ws.onopen = () => {
-            console.log('Connected to the WebSocket server');
-        };
-
-        ws.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            setResult(data.result);  // Update the result whenever a new one is received
-        };
-
-        ws.onerror = (e) => {
-            console.error('WebSocket error: ', e);
-        };
-
-        ws.onclose = (e) => {
-            console.log('WebSocket connection closed');
-        };
-
-        return () => {
-            ws.close();  // Clean up WebSocket on component unmount
-        };
-    }, []);
 
     const headerOpacity = scrollY.interpolate({
         inputRange: [0, 150], // Start fading after 150 pixels of scroll
@@ -50,7 +17,6 @@ export default function Home() {
         extrapolate: 'clamp', // Don't go beyond this range
     });
 
-    // Interpolate the scroll value to reduce the height of the header
     const headerHeight = scrollY.interpolate({
         inputRange: [0, 150], // Start reducing height after 150 pixels of scroll
         outputRange: [height * 0.1, 0], // Full height to 0 (disappears)
@@ -62,49 +28,44 @@ export default function Home() {
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            {/* Animated Header */}
-            <Animated.View style={[styles.header, { opacity: headerOpacity, height: headerHeight }]}>
-                <Animated.Text style={[styles.headerText, { opacity: headerOpacity }]}>
-                    Welcome to Shrimp
-                </Animated.Text>
+        <WebSocketProvider>
+            <SafeAreaView style={styles.safeArea}>
+                {/* Animated Header */}
+                <Animated.View style={[styles.header, { opacity: headerOpacity, height: headerHeight }]}>
+                    <Animated.Text style={[styles.headerText, { opacity: headerOpacity }]}>
+                        Welcome to Shrimp
+                    </Animated.Text>
 
-                <Animated.View style={[styles.signOutContainer, { opacity: headerOpacity }]}>
-                    <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
-                        <Text style={styles.signOutText}>Sign Out</Text>
-                    </TouchableOpacity>
+                    <Animated.View style={[styles.signOutContainer, { opacity: headerOpacity }]}>
+                        <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
+                            <Text style={styles.signOutText}>Sign Out</Text>
+                        </TouchableOpacity>
+                    </Animated.View>
                 </Animated.View>
-            </Animated.View>
 
-            {/* Scrollable content */}
-            <Animated.ScrollView
-                contentContainerStyle={styles.container}
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: false } // Native driver doesn't support height and opacity yet
-                )}
-                scrollEventThrottle={16} // Smooth scrolling updates
-            >
-                <View style={styles.sectionLarge}>
-                    <Text>Real-time Model Result: {result ? result.prediction : 'Waiting for result...'}</Text>
-                    <NotificationsComponent />
-                </View>
-
-                <View style={styles.sectionSmall}>
-                    <Text style={styles.sectionHeader}>Bar Graph</Text>
-                    <View style={styles.graphContainer}>
-                        {/* <Graphs graphType="bar" /> */}
+                {/* Scrollable content */}
+                <Animated.ScrollView
+                    contentContainerStyle={styles.container}
+                    onScroll={Animated.event(
+                        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                        { useNativeDriver: false }
+                    )}
+                    scrollEventThrottle={16}
+                >
+                    <View style={styles.sectionLarge}>
+                        <Text>Real-time Model Result: Waiting for result...</Text>
+                        <NotificationsComponent />
                     </View>
-                </View>
 
-                <View style={styles.sectionSmall}>
-                    <Text style={styles.sectionHeader}>Line Graph</Text>
-                    <View style={styles.graphContainer}>
-                        {/* <Graphs graphType="line" /> */}
+                    <View style={styles.sectionSmall}>
+                        <Text style={styles.sectionHeader}>Bar Graph</Text>
+                        <View style={styles.graphContainer}>
+                            <Graphs />
+                        </View>
                     </View>
-                </View>
-            </Animated.ScrollView>
-        </SafeAreaView>
+                </Animated.ScrollView>
+            </SafeAreaView>
+        </WebSocketProvider>
     );
 }
 
@@ -125,7 +86,6 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#b35242',
-        fontFamily: 'Pt',
     },
     signOutContainer: {
         justifyContent: 'center',
@@ -169,11 +129,6 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 10,
-        color: '#fff3e6',
-    },
-    sectionContent: {
-        fontSize: 16,
-        lineHeight: 24,
         color: '#fff3e6',
     },
     graphContainer: {
