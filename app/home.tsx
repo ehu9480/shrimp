@@ -44,7 +44,7 @@ export default function Home() {
     const [result, setResult] = useState<ResultType | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket('ws://10.48.163.223:8080/ws');
+        const ws = new WebSocket();
 
         ws.onopen = () => {
             console.log('Connected to WebSocket');
