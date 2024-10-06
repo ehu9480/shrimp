@@ -7,9 +7,9 @@ import { router } from 'expo-router';
 const Login = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const pinataJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI3ZTQzMTc0ZC0yMjlhLTRiNTYtYTM4OC1iMzlkNmJlNmZkZjEiLCJlbWFpbCI6ImF5YWFuLmJhcmdlZXJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiRlJBMSJ9LHsiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiTllDMSJ9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImZhYjBkNjlmYWJiZjZhNjUwMGUzIiwic2NvcGVkS2V5U2VjcmV0IjoiNzg4ZGU3NWEwMzg0NDljYTFjMzcxYTIxNzFlZWI2ODZiYWE4Y2EyZDU0NTc2ZDgwY2QwZTM1OWY4NGNmZWI5MCIsImV4cCI6MTc1OTYzMjUwOH0.HxtiMazJJJo45Kt3nTjOnl7Y0uRpDaS0L0EHM17kDhQ"
-  const pinataGateway = "ivory-hidden-thrush-846.mypinata.cloud"
-  const userscid = "bafkreigk3gef4zfasqndybzk5httrq6ry3tycov6b2llmk44b44huvm3dq"
+  const pinataJwt = ""
+  const pinataGateway = ""
+  const userscid = ""
   const pinata = new PinataSDK({
     pinataJwt: pinataJwt,
     pinataGateway: pinataGateway,
