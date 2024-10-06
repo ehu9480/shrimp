@@ -4,7 +4,7 @@ import { BarChart, LineChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get('window').width;
 
-const Graphs = () => {
+const Graphs = ({ graphType }) => {
   // Arbitrary data for the bar chart
   const barData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
@@ -28,27 +28,28 @@ const Graphs = () => {
 
   return (
     <View style={styles.container}>
-      {/* Bar Chart for Section 2 */}
-      <View style={styles.chartContainer}>
-        <BarChart
-          data={barData}
-          width={screenWidth - 40} // from react-native
-          height={220}
-          chartConfig={chartConfig}
-          style={styles.chart}
-        />
-      </View>
-
-      {/* Line Chart for Section 3 */}
-      <View style={styles.chartContainer}>
-        <LineChart
-          data={lineData}
-          width={screenWidth - 40} // from react-native
-          height={220}
-          chartConfig={chartConfig}
-          style={styles.chart}
-        />
-      </View>
+      {graphType === 'bar' && (
+        <View style={styles.chartContainer}>
+          <BarChart
+            data={barData}
+            width={screenWidth - 40} // from react-native
+            height={220}
+            chartConfig={chartConfig}
+            style={styles.chart}
+          />
+        </View>
+      )}
+      {graphType === 'line' && (
+        <View style={styles.chartContainer}>
+          <LineChart
+            data={lineData}
+            width={screenWidth - 40} // from react-native
+            height={220}
+            chartConfig={chartConfig}
+            style={styles.chart}
+          />
+        </View>
+      )}
     </View>
   );
 };
