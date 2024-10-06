@@ -1,7 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView, Text } from 'react-native';
+import React, { useRef } from 'react';
+import { Animated, ScrollView, View, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
 
-const { height, width } = Dimensions.get('window'); // Get screen height and width for sizing the sections
+const { height } = Dimensions.get('window');
 
 type ModelResult = {
     prediction: string;
@@ -9,73 +9,60 @@ type ModelResult = {
 
 export default function Home() {
     const scrollY = useRef(new Animated.Value(0)).current;
-    const [result, setResult] = useState<ModelResult | null>(null);
 
+    // Interpolate the scroll value to create the opacity for the header
     const headerOpacity = scrollY.interpolate({
-        inputRange: [0, 150], 
-        outputRange: [1, 0],
-        extrapolate: 'clamp',
+        inputRange: [0, 150], // Start fading after 150 pixels of scroll
+        outputRange: [1, 0], // Fully visible to invisible
+        extrapolate: 'clamp', // Don't go beyond this range
     });
 
+    // Interpolate the scroll value to reduce the height of the header
     const headerHeight = scrollY.interpolate({
-        inputRange: [0, 150],
-        outputRange: [height * 0.1, 0],
-        extrapolate: 'clamp',
+        inputRange: [0, 150], // Start reducing height after 150 pixels of scroll
+        outputRange: [height * 0.1, 0], // Full height to 0 (disappears)
+        extrapolate: 'clamp', // Don't go beyond this range
     });
-
-    // useEffect(() => {
-    //     const ws = new WebSocket('ws://10.48.163.223:8000');  
-    
-    //     ws.onopen = () => {
-    //       console.log('Connected to the WebSocket server');
-    //     };
-    
-    //     ws.onmessage = (e) => {
-    //       const data = JSON.parse(e.data);
-    //       setResult(data.result); 
-    //     };
-    
-    //     ws.onerror = (e) => {
-    //       console.error('WebSocket error: ', e);
-    //     };
-    
-    //     ws.onclose = (e) => {
-    //       console.log('WebSocket connection closed');
-    //     };
-    
-    //     return () => {
-    //       ws.close();  
-    //     };
-    //   }, []);
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            {/* Animated Header */}
             <Animated.View style={[styles.header, { opacity: headerOpacity, height: headerHeight }]}>
                 <Animated.Text style={[styles.headerText, { opacity: headerOpacity }]}>
                     Welcome to Shrimp
                 </Animated.Text>
+
+                <Animated.View style={[styles.signOutContainer, { opacity: headerOpacity }]}>
+                    <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
+                        <Text style={styles.signOutText}>Sign Out</Text>
+                    </TouchableOpacity>
+                </Animated.View>
             </Animated.View>
 
+            {/* Scrollable content */}
             <Animated.ScrollView
                 contentContainerStyle={styles.container}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: false }
+                    { useNativeDriver: false } // Native driver doesn't support height and opacity yet
                 )}
-                scrollEventThrottle={16} 
+                scrollEventThrottle={16} // Smooth scrolling updates
             >
-                {/* First section - nearly full page */}
                 <View style={styles.sectionLarge}>
-                    {/* <Text>Shrimping? {result ? result.prediction : 'Waiting for result...'}</Text> */}
+                    {/* No text content here as requested */}
                 </View>
 
-                {/* Second and third sections - smaller vertical boxes */}
-                <View style={styles.sectionSmallContainer}>
-                    <View style={styles.sectionSmall}>
-                        {/* No text content here as requested */}
+                <View style={styles.sectionSmall}>
+                    <Text style={styles.sectionHeader}>Bar Graph</Text>
+                    <View style={styles.graphContainer}>
+                        {/* <Graphs graphType="bar" /> */}
                     </View>
-                    <View style={styles.sectionSmall}>
-                        {/* No text content here as requested */}
+                </View>
+
+                <View style={styles.sectionSmall}>
+                    <Text style={styles.sectionHeader}>Line Graph</Text>
+                    <View style={styles.graphContainer}>
+                        {/* <Graphs graphType="line" /> */}
                     </View>
                 </View>
             </Animated.ScrollView>
@@ -86,42 +73,74 @@ export default function Home() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#fff3e6', // Black background color for the whole app
+        backgroundColor: '#fff3e6',
     },
     header: {
-        justifyContent: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#fff3e6', // Header background color
-        overflow: 'hidden', // Ensure height shrinkage looks smooth
+        backgroundColor: '#fff3e6',
+        overflow: 'hidden',
+        paddingHorizontal: 20,
     },
     headerText: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#b35242', // White text for the header
-        fontFamily: 'Pt', // Softer, rounder font
+        color: '#b35242',
+        fontFamily: 'Pt',
+    },
+    signOutContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    signOutButton: {
+        backgroundColor: '#b35242',
+        borderRadius: 8,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+    },
+    signOutText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     container: {
         paddingVertical: 20,
-        backgroundColor: '#fff3e6', // Keep the scrollable area black as well
+        backgroundColor: '#fff3e6',
     },
     sectionLarge: {
-        height: height * 0.7, // Almost full-screen height for the first section
+        height: height * 0.7,
         backgroundColor: '#b35242',
         marginHorizontal: 20,
         marginBottom: 20,
         borderRadius: 16,
         padding: 20,
         justifyContent: 'center',
-    },
-    sectionSmallContainer: {
-        marginHorizontal: 20,
+        alignItems: 'center',
     },
     sectionSmall: {
-        height: height * 0.4, // Smaller height for the second and third sections (20% of screen height)
+        height: height * 0.4,
         backgroundColor: '#e2a67d',
+        marginHorizontal: 20,
         borderRadius: 16,
         padding: 20,
         marginBottom: 20,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+    },
+    sectionHeader: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#fff3e6',
+    },
+    sectionContent: {
+        fontSize: 16,
+        lineHeight: 24,
+        color: '#fff3e6',
+    },
+    graphContainer: {
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        width: '100%',
     },
 });
